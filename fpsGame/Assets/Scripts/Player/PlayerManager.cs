@@ -6,17 +6,10 @@ using UnityEngine.SceneManagement;
 
 public class PlayerManager : MonoBehaviour
 {
-    //Instance
-    public static PlayerManager instance;
-    private void Awake()
-    {
-        instance = this;
-    }
-
 
     //movement
-    public float Speed = 10f
-
+    public float Speed = 10f;
+    
 
     public GameObject orientation = null;
     public Camera camMain = null;
