@@ -21,6 +21,12 @@ public class PlayerManager : MonoBehaviour
     float horizontalInput;
     float verticalInput;
     public Rigidbody rb;
+    public float jumpForce;
+    public float jumpCoolDown;
+    public float airMultiplier;
+    [SerializeField]
+    bool readytoJummp = true;
+
 
     [Header("groundCheck")]
     public float playerHight = 2;
@@ -38,6 +44,10 @@ public class PlayerManager : MonoBehaviour
     
     float xRot = 0;
     float yRot = 0;
+
+    [Header("KeyBindings")]
+    public KeyCode jumpKey = KeyCode.Space;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -59,6 +69,8 @@ public class PlayerManager : MonoBehaviour
 
         if (isOnGround()) { rb.drag = groundDrag; Debug.Log("Grounded :" + isOnGround()); }
         else rb.drag = 0;
+
+        Debug.Log("ground check " + isOnGround());
     }
 
     
@@ -90,12 +102,20 @@ public class PlayerManager : MonoBehaviour
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
+
+        if (isOnGround() && readytoJummp && Input.GetKey(jumpKey))
+        {
+            readytoJummp = false;
+            Jump();
+            Invoke(nameof(ResetJump), jumpCoolDown);
+        }
     }
     private void movePlayer()
     {
         Debug.Log("Masti");
         moveDirection = playerTransform.forward * verticalInput + playerTransform.right * horizontalInput;
-        rb.AddForce(moveDirection.normalized * moveSpeed * 10, ForceMode.Force);
+        if(isOnGround()) rb.AddForce(moveDirection.normalized * moveSpeed * 10 * rb.mass, ForceMode.Force);
+        else rb.AddForce(moveDirection.normalized * moveSpeed * 10 * rb.mass * airMultiplier, ForceMode.Force);
     }
     private void speedControl()
     {
@@ -106,5 +126,14 @@ public class PlayerManager : MonoBehaviour
             Vector3 limitVel = flatVel.normalized * moveSpeed;
             rb.velocity = new Vector3(limitVel.x, rb.velocity.y, limitVel.z);
         }
+    }
+    private void Jump()
+    {
+        rb.velocity = new Vector3(rb.velocity.x, 0f , rb.velocity.z);
+        rb.AddForce(transform.up * jumpForce * (rb.mass/2), ForceMode.Impulse);
+    }
+    public void ResetJump()
+    {
+         readytoJummp = true;
     }
 }

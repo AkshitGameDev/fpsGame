@@ -8,7 +8,7 @@ using static UnityEngine.GraphicsBuffer;
 public class SlopeAngleCalculator : MonoBehaviour
 {
     RaycastHit hit;
-    public GameObject test;
+   // public GameObject test;
 
     public static SlopeAngleCalculator instance;
     private void Awake()
@@ -23,7 +23,7 @@ public class SlopeAngleCalculator : MonoBehaviour
         if (hit.point != null){ Vector3 targetDir = hit.point - transform.position;
         float anglex = Vector3.Angle(targetDir, Vector3.forward);
         Vector3 rot = new Vector3(anglex, 1, 0);
-        test.transform.Rotate(rot);
+       // test.transform.Rotate(rot);
         Debug.Log("slope angle" + rot); 
         }
 
