@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CamerFollow : MonoBehaviour
@@ -13,6 +14,7 @@ public class CamerFollow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        PlayerManager.instance.camMain.transform.rotation = transform.rotation;
+        PlayerManager.instance.camMain.transform.position = transform.position;
     }
 }
