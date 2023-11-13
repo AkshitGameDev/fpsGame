@@ -12,10 +12,22 @@ public class PlayerManager : MonoBehaviour
         instance = this;
     }
 
+    public MoveState state;
+    public enum MoveState
+    {
+        wallkig,
+        sprinting,
+        crouching,
+        air
+    }
+
     [Header("Movement")]
     Transform playerTransform;
     [SerializeField]
     private float moveSpeed = 10f;
+    public float walkSpeed = 5f;
+    public float runSpeed = 10f;
+
     public float groundDrag = 0.1f;
     Vector3 moveDirection = new Vector3();
     float horizontalInput;
@@ -27,12 +39,19 @@ public class PlayerManager : MonoBehaviour
     [SerializeField]
     bool readytoJummp = true;
 
+    [Header("Crouching")]
+    public float crouchspeed = 4.0f;
+    public float crouchYscale;
+    public float startYscale;
 
     [Header("groundCheck")]
     public float playerHight = 2;
     public LayerMask whatIsGround;
     bool grounded;
 
+    [Header("Slope")]
+    public float maxSlope = 30f;
+    private RaycastHit sloppeHit;
 
     [Header("Camera")]
     public GameObject orientation = null;
@@ -47,10 +66,14 @@ public class PlayerManager : MonoBehaviour
 
     [Header("KeyBindings")]
     public KeyCode jumpKey = KeyCode.Space;
+    public KeyCode SprintKey = KeyCode.LeftShift;
+    public KeyCode CrouchKey = KeyCode.LeftControl;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        startYscale = transform.localScale.y;
         camMain = Camera.main;
         Debug.Log("camMain is", cameraNode);
         Cursor.lockState = CursorLockMode.Locked;
@@ -66,6 +89,7 @@ public class PlayerManager : MonoBehaviour
 
         myInput();
         speedControl();
+        stateHandler();
 
         if (isOnGround()) { rb.drag = groundDrag; Debug.Log("Grounded :" + isOnGround()); }
         else rb.drag = 0;
@@ -73,7 +97,28 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("ground check " + isOnGround());
     }
 
-    
+    public void stateHandler()
+    {
+        if (Input.GetKey(CrouchKey))
+        {
+            state = MoveState.crouching;
+            moveSpeed = crouchspeed;
+        }
+        else if (grounded && Input.GetKey(SprintKey))
+        {
+            state = MoveState.sprinting;
+            moveSpeed = runSpeed;
+        }
+        else if(grounded)
+        {
+            state = MoveState.wallkig;
+            moveSpeed = walkSpeed;
+        }
+        else
+        {
+            state = MoveState.air;
+        }
+    }
 
     private void FixedUpdate()
     {
@@ -109,6 +154,15 @@ public class PlayerManager : MonoBehaviour
             Jump();
             Invoke(nameof(ResetJump), jumpCoolDown);
         }
+
+        if(Input.GetKeyDown(CrouchKey)) {
+            transform.localScale  = new Vector3(transform.localScale.x, crouchYscale, transform.localScale.z);
+            rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
+        }
+        else if(Input.GetKeyUp(CrouchKey))
+        {
+            transform.localScale = new Vector3(transform.localScale.x, startYscale, transform.localScale.z);
+        }
     }
     private void movePlayer()
     {
@@ -135,5 +189,13 @@ public class PlayerManager : MonoBehaviour
     public void ResetJump()
     {
          readytoJummp = true;
+    }
+    private bool onSlope()
+    {
+        if(Physics.Raycast(transform.position, Vector3.down, out sloppeHit, playerHight * 0.5f + 0.3f))
+        {
+
+        }
+        return readytoJummp;
     }
 }

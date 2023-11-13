@@ -6120,6 +6120,10 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 6615955206771348707, guid: 985e4b200bf80cb40b78e30b4fff8cce, type: 3}
+      propertyPath: crouchYscale
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615955206771348707, guid: 985e4b200bf80cb40b78e30b4fff8cce, type: 3}
       propertyPath: jumpCoolDown
       value: 1.4
       objectReference: {fileID: 0}
